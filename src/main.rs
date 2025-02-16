@@ -1,15 +1,21 @@
+use game::{draw_game_state, gather_frame_input, init_game_state, update_game_state};
 use macroquad::prelude::*;
 
-#[macroquad::main("BasicShapes")]
+mod game;
+
+#[macroquad::main("Microship")]
 async fn main() {
-    loop {
-        clear_background(RED);
+    let mut state = init_game_state();
 
-        draw_line(40.0, 40.0, 100.0, 200.0, 15.0, BLUE);
-        draw_rectangle(screen_width() / 2.0 - 60.0, 100.0, 120.0, 60.0, GREEN);
-        draw_circle(screen_width() - 30.0, screen_height() - 30.0, 15.0, YELLOW);
-
-        draw_text("IT WORKS!", 20.0, 20.0, 30.0, DARKGRAY);
+    'game: loop {
+        let res = update_game_state(&mut state, gather_frame_input(), get_frame_time());
+        if res.is_err() {
+            break 'game;
+        }
+        let res = draw_game_state(&state);
+        if res.is_err() {
+            break 'game;
+        }
 
         next_frame().await
     }
