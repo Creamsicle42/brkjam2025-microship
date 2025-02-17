@@ -1,7 +1,7 @@
 use crate::game::ActiveState;
 
 use super::{
-    microgames::{always_win, gen_new_microgame, Microgames},
+    microgames::{always_win, gen_new_microgame, pipes, Microgames},
     FrameInput, GameEvents, GameState,
 };
 use macroquad::prelude::*;
@@ -56,6 +56,7 @@ pub fn update(
 
         let microgame_won = match &mut gs_data.current_microgame {
             Microgames::AlwaysWin(d) => always_win::update(d, input, delta),
+            Microgames::Pipes(d) => pipes::update(d, input, delta),
             _ => true,
         };
 
@@ -100,6 +101,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
     if let ActiveState::InGame(gs_data) = &game_data.active_state {
         match &gs_data.current_microgame {
             Microgames::AlwaysWin(d) => always_win::draw(d),
+            Microgames::Pipes(d) => pipes::draw(d),
             _ => {}
         }
 
