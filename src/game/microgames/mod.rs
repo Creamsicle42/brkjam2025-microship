@@ -1,4 +1,5 @@
 pub mod always_win;
+pub mod asteroids;
 pub mod combo;
 pub mod course;
 pub mod pipes;
@@ -11,8 +12,9 @@ pub enum Microgames {
     Combo(combo::Data),
     Course(course::Data),
     Sweep(sweep::Data),
+    Asteroids(asteroids::Data),
 }
 
 pub fn gen_new_microgame() -> Microgames {
-    return Microgames::Sweep(sweep::Data::default());
+    return Microgames::Asteroids(asteroids::Data::default());
 }
