@@ -2,8 +2,8 @@ use crate::game::ActiveState;
 
 use super::{
     microgames::{
-        always_win, asteroids, combo, course, crank, gen_new_microgame, imposter, pipes, swap,
-        sweep, Microgames,
+        always_win, asteroids, combo, course, crank, gen_microgame, gen_microgame_queue,
+        gen_new_microgame, imposter, pipes, swap, sweep, Microgames,
     },
     FrameInput, GameEvents, GameState, MousePressState,
 };
@@ -31,16 +31,19 @@ pub struct InGameData {
     current_microgame_win: bool,
     microgame_state: MicrogameState,
     current_microgame: Microgames,
+    game_queue: Vec<u8>,
 }
 
 impl Default for InGameData {
     fn default() -> Self {
+        let mut game_queue = gen_microgame_queue();
         InGameData {
             microgames_completed: 0,
             lives: 3,
             current_microgame_win: false,
             microgame_state: MicrogameState::TransIn(1.0),
-            current_microgame: gen_new_microgame(),
+            current_microgame: gen_microgame(game_queue.pop().unwrap()),
+            game_queue,
         }
     }
 }
@@ -108,7 +111,7 @@ pub fn update(
                     MicrogameState::TransOut(0.5)
                 }
                 MicrogameState::TransOut(_) => {
-                    gs_data.current_microgame = gen_new_microgame();
+                    gs_data.current_microgame = gen_microgame(gs_data.game_queue.pop().unwrap());
                     if gs_data.microgames_completed == 15 && gs_data.lives > 0 {
                         events.push(GameEvents::GameWon);
                     }
