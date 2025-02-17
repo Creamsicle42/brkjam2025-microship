@@ -7,8 +7,8 @@ fn game_config() -> Conf {
     Conf {
         window_title: "Microship".to_string(),
         window_resizable: false,
-        window_width: 1000,
-        window_height: 750,
+        window_width: 960,
+        window_height: 600,
         ..Default::default()
     }
 }
