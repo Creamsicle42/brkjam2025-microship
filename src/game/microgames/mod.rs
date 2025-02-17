@@ -3,6 +3,7 @@ pub mod always_win;
 pub mod asteroids;
 pub mod combo;
 pub mod course;
+pub mod crank;
 pub mod imposter;
 pub mod pipes;
 pub mod swap;
@@ -17,6 +18,7 @@ pub enum Microgames {
     Sweep(sweep::Data),
     Asteroids(asteroids::Data),
     Imposter(imposter::Data),
+    Crank(crank::Data),
     Swap(swap::Data),
 }
 
@@ -29,5 +31,5 @@ pub fn gen_new_microgame() -> Microgames {
     //    4 => Microgames::Asteroids(asteroids::Data::default()),
     //    _ => Microgames::AlwaysWin(always_win::Data {}),
     //}
-    return Microgames::Swap(swap::Data::default());
+    return Microgames::Crank(crank::Data::default());
 }
