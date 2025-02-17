@@ -2,7 +2,7 @@ use crate::game::ActiveState;
 
 use super::{
     microgames::{
-        always_win, asteroids, combo, course, gen_new_microgame, pipes, sweep, Microgames,
+        always_win, asteroids, combo, course, gen_new_microgame, imposter, pipes, sweep, Microgames,
     },
     FrameInput, GameEvents, GameState, MousePressState,
 };
@@ -82,6 +82,7 @@ pub fn update(
             Microgames::Course(d) => course::update(d, filtered_input, delta),
             Microgames::Sweep(d) => sweep::update(d, filtered_input, delta),
             Microgames::Asteroids(d) => asteroids::update(d, filtered_input, delta),
+            Microgames::Imposter(d) => imposter::update(d, filtered_input, delta),
             _ => true,
         };
 
@@ -131,6 +132,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
             Microgames::Course(d) => course::draw(d),
             Microgames::Sweep(d) => sweep::draw(d),
             Microgames::Asteroids(d) => asteroids::draw(d),
+            Microgames::Imposter(d) => imposter::draw(d),
             _ => {}
         }
 
