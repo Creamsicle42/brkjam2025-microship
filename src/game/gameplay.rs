@@ -2,14 +2,24 @@ use crate::game::ActiveState;
 
 use super::{
     microgames::{always_win, gen_new_microgame, pipes, Microgames},
-    FrameInput, GameEvents, GameState,
+    FrameInput, GameEvents, GameState, MousePressState,
 };
 use macroquad::prelude::*;
 
+#[derive(Debug, PartialEq)]
 enum MicrogameState {
     TransOut(f32),
     TransIn(f32),
     InMicrogame(f32),
+}
+
+impl MicrogameState {
+    fn is_in_microgame(&self) -> bool {
+        match self {
+            MicrogameState::InMicrogame(_) => true,
+            _ => false,
+        }
+    }
 }
 
 pub struct InGameData {
@@ -54,9 +64,18 @@ pub fn update(
             }
         };
 
+        let filtered_input: FrameInput = if gs_data.microgame_state.is_in_microgame() {
+            input
+        } else {
+            FrameInput {
+                mouse_position: Vec2::ZERO,
+                mouse_state: MousePressState::NotPressed,
+            }
+        };
+
         let microgame_won = match &mut gs_data.current_microgame {
-            Microgames::AlwaysWin(d) => always_win::update(d, input, delta),
-            Microgames::Pipes(d) => pipes::update(d, input, delta),
+            Microgames::AlwaysWin(d) => always_win::update(d, filtered_input, delta),
+            Microgames::Pipes(d) => pipes::update(d, filtered_input, delta),
             _ => true,
         };
 
