@@ -38,6 +38,10 @@ pub struct FrameInput {
     mouse_state: MousePressState,
 }
 
+pub fn vec2_in_range(v: &Vec2, r: &(Vec2, Vec2)) -> bool {
+    v.x > r.0.x && v.x < r.1.x && v.y > r.0.y && v.y < r.1.y
+}
+
 pub fn gather_frame_input() -> FrameInput {
     FrameInput {
         mouse_position: {
