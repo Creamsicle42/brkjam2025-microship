@@ -1,7 +1,7 @@
 use crate::game::ActiveState;
 
 use super::{
-    microgames::{always_win, combo, course, gen_new_microgame, pipes, Microgames},
+    microgames::{always_win, combo, course, gen_new_microgame, pipes, sweep, Microgames},
     FrameInput, GameEvents, GameState, MousePressState,
 };
 use macroquad::prelude::*;
@@ -78,6 +78,7 @@ pub fn update(
             Microgames::Pipes(d) => pipes::update(d, filtered_input, delta),
             Microgames::Combo(d) => combo::update(d, filtered_input, delta),
             Microgames::Course(d) => course::update(d, filtered_input, delta),
+            Microgames::Sweep(d) => sweep::update(d, filtered_input, delta),
             _ => true,
         };
 
@@ -125,6 +126,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
             Microgames::Pipes(d) => pipes::draw(d),
             Microgames::Combo(d) => combo::draw(d),
             Microgames::Course(d) => course::draw(d),
+            Microgames::Sweep(d) => sweep::draw(d),
             _ => {}
         }
 

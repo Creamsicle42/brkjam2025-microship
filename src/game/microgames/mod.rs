@@ -2,6 +2,7 @@ pub mod always_win;
 pub mod combo;
 pub mod course;
 pub mod pipes;
+pub mod sweep;
 
 pub enum Microgames {
     Dummy,
@@ -9,8 +10,9 @@ pub enum Microgames {
     Pipes(pipes::Data),
     Combo(combo::Data),
     Course(course::Data),
+    Sweep(sweep::Data),
 }
 
 pub fn gen_new_microgame() -> Microgames {
-    return Microgames::Course(course::Data::default());
+    return Microgames::Sweep(sweep::Data::default());
 }
