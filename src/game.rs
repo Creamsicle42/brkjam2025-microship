@@ -1,4 +1,6 @@
 #![allow(dead_code, unused)]
+use std::collections::HashMap;
+
 use gameplay::InGameData;
 use macroquad::prelude::*;
 use main_menu::MainMenuData;
@@ -24,6 +26,7 @@ enum ActiveState {
 
 pub struct GameState {
     active_state: ActiveState,
+    textures: HashMap<&'static str, Texture2D>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -61,7 +64,37 @@ pub fn gather_frame_input() -> FrameInput {
 }
 
 pub fn init_game_state() -> GameState {
+    let mut textures: HashMap<&str, Texture2D> = HashMap::new();
+
+    textures.insert(
+        "right_door",
+        Texture2D::from_file_with_format(include_bytes!("../assets/right_door.png"), None),
+    );
+    textures.insert(
+        "left_door",
+        Texture2D::from_file_with_format(include_bytes!("../assets/left_door.png"), None),
+    );
+    textures.insert(
+        "pipes_bkgd",
+        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_bkgd.png"), None),
+    );
+    textures.insert(
+        "pipes_patch_1",
+        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_patch_1.png"), None),
+    );
+    textures.insert(
+        "pipes_patch_2",
+        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_patch_2.png"), None),
+    );
+    textures.insert(
+        "pipes_patch_3",
+        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_patch_3.png"), None),
+    );
+
+    build_textures_atlas();
+
     GameState {
+        textures,
         active_state: ActiveState::MainMenu(MainMenuData::default()),
     }
 }

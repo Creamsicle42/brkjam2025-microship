@@ -41,7 +41,7 @@ impl Default for InGameData {
             microgames_completed: 0,
             lives: 3,
             current_microgame_win: false,
-            microgame_state: MicrogameState::TransIn(1.0),
+            microgame_state: MicrogameState::TransIn(0.5),
             current_microgame: gen_microgame(game_queue.pop().unwrap()),
             game_queue,
         }
@@ -108,7 +108,7 @@ pub fn update(
                         gs_data.lives -= 1;
                     }
                     gs_data.microgames_completed += 1;
-                    MicrogameState::TransOut(0.5)
+                    MicrogameState::TransOut(0.75)
                 }
                 MicrogameState::TransOut(_) => {
                     gs_data.current_microgame = gen_microgame(gs_data.game_queue.pop().unwrap());
@@ -118,7 +118,7 @@ pub fn update(
                     if gs_data.lives <= 0 {
                         events.push(GameEvents::GameLost);
                     }
-                    MicrogameState::TransIn(0.5)
+                    MicrogameState::TransIn(0.75)
                 }
             }
         }
@@ -129,11 +129,15 @@ pub fn update(
     }
 }
 
+fn lerp(f: f32, t: f32, d: f32) -> f32 {
+    t * d + f * (1.0 - d)
+}
+
 pub fn draw(game_data: &GameState) -> Result<(), ()> {
     if let ActiveState::InGame(gs_data) = &game_data.active_state {
         match &gs_data.current_microgame {
             Microgames::AlwaysWin(d) => always_win::draw(d),
-            Microgames::Pipes(d) => pipes::draw(d),
+            Microgames::Pipes(d) => pipes::draw(d, &game_data.textures),
             Microgames::Combo(d) => combo::draw(d),
             Microgames::Course(d) => course::draw(d),
             Microgames::Sweep(d) => sweep::draw(d),
@@ -155,6 +159,43 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
             );
         } else {
             draw_text("Hold it!", 16.0, 42.0, 32.0, BLACK);
+
+            let r_door = game_data.textures.get("right_door").unwrap();
+            let l_door = game_data.textures.get("left_door").unwrap();
+
+            match gs_data.microgame_state {
+                MicrogameState::TransIn(t) => {
+                    let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
+                    draw_texture(
+                        l_door,
+                        lerp(0.0, -500.0, raw_progress * raw_progress),
+                        0.0,
+                        WHITE,
+                    );
+                    draw_texture(
+                        r_door,
+                        lerp(462.0, 1000.0, raw_progress * raw_progress),
+                        0.0,
+                        WHITE,
+                    );
+                }
+                MicrogameState::TransOut(t) => {
+                    let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
+                    draw_texture(
+                        l_door,
+                        lerp(-500.0, 0.0, raw_progress * raw_progress),
+                        0.0,
+                        WHITE,
+                    );
+                    draw_texture(
+                        r_door,
+                        lerp(1000.0, 462.0, raw_progress * raw_progress),
+                        0.0,
+                        WHITE,
+                    );
+                }
+                _ => {}
+            };
         }
 
         draw_text(

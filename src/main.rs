@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use game::{draw_game_state, gather_frame_input, init_game_state, update_game_state};
 use macroquad::{prelude::*, rand, time, window::Conf};
 
