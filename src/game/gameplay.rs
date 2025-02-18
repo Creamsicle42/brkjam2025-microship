@@ -138,7 +138,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
         match &gs_data.current_microgame {
             Microgames::AlwaysWin(d) => always_win::draw(d),
             Microgames::Pipes(d) => pipes::draw(d, &game_data.textures),
-            Microgames::Combo(d) => combo::draw(d),
+            Microgames::Combo(d) => combo::draw(d, &game_data.textures),
             Microgames::Course(d) => course::draw(d),
             Microgames::Sweep(d) => sweep::draw(d),
             Microgames::Asteroids(d) => asteroids::draw(d),

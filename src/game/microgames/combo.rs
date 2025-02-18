@@ -1,4 +1,4 @@
-use std::{iter::zip, usize};
+use std::{collections::HashMap, iter::zip, usize};
 
 use crate::game::{FrameInput, MousePressState};
 use macroquad::prelude::*;
@@ -23,8 +23,14 @@ impl Default for Data {
         let buttons: Vec<Button> = zip((0..4), b_order)
             .map(|(bnum, order)| Button {
                 range: (
-                    Vec2::new(116.0 + 116.0 * bnum as f32, 116.0),
-                    Vec2::new(216.0 + 116.0 * bnum as f32, 216.0),
+                    Vec2::new(
+                        340.0 + 160.0 * (bnum % 2) as f32,
+                        150.0 + 160.0 * (bnum / 2) as f32,
+                    ),
+                    Vec2::new(
+                        460.0 + 160.0 * (bnum % 2) as f32,
+                        270.0 + 160.0 * (bnum / 2) as f32,
+                    ),
                 ),
                 pressed: false,
                 order,
@@ -76,32 +82,21 @@ pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
         .unwrap()
 }
 
-pub fn draw(data: &Data) {
+pub fn draw(data: &Data, textures: &HashMap<&str, Texture2D>) {
     clear_background(WHITE);
+    draw_texture(textures.get("combo_bkgd").unwrap(), 0.0, 0.0, WHITE);
+
     for button in data.buttons.iter() {
-        if button.pressed {
-            draw_rectangle(
-                button.range.0.x,
-                button.range.0.y,
-                button.range.1.x - button.range.0.x,
-                button.range.1.y - button.range.0.y,
-                GREEN,
-            );
-        } else {
-            draw_rectangle(
-                button.range.0.x,
-                button.range.0.y,
-                button.range.1.x - button.range.0.x,
-                button.range.1.y - button.range.0.y,
-                RED,
-            );
-        }
-        draw_text(
-            format!("{}", button.order).as_str(),
-            button.range.0.x + 50.0,
-            button.range.0.y + 50.0,
-            32.0,
-            BLACK,
-        );
+        let tex = textures
+            .get(
+                format!(
+                    "combo_{}_{}",
+                    if button.pressed { "green" } else { "red" },
+                    button.order + 1
+                )
+                .as_str(),
+            )
+            .unwrap();
+        draw_texture(tex, button.range.0.x, button.range.0.y, WHITE);
     }
 }

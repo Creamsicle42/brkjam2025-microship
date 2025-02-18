@@ -90,6 +90,42 @@ pub fn init_game_state() -> GameState {
         "pipes_patch_3",
         Texture2D::from_file_with_format(include_bytes!("../assets/pipes_patch_3.png"), None),
     );
+    textures.insert(
+        "combo_bkgd",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_bkgd.png"), None),
+    );
+    textures.insert(
+        "combo_red_1",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_1.png"), None),
+    );
+    textures.insert(
+        "combo_red_2",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_2.png"), None),
+    );
+    textures.insert(
+        "combo_red_3",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_3.png"), None),
+    );
+    textures.insert(
+        "combo_red_4",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_4.png"), None),
+    );
+    textures.insert(
+        "combo_green_1",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_1.png"), None),
+    );
+    textures.insert(
+        "combo_green_2",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_2.png"), None),
+    );
+    textures.insert(
+        "combo_green_3",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_3.png"), None),
+    );
+    textures.insert(
+        "combo_green_4",
+        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_4.png"), None),
+    );
 
     build_textures_atlas();
 

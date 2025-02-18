@@ -36,7 +36,7 @@ pub fn gen_new_microgame() -> Microgames {
 }
 
 pub fn gen_microgame(game_id: u8) -> Microgames {
-    return Microgames::Pipes(pipes::Data::default());
+    return Microgames::Combo(combo::Data::default());
     match game_id {
         0 => Microgames::Pipes(pipes::Data::default()),
         1 => Microgames::Combo(combo::Data::default()),
