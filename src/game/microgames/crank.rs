@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::game::{FrameInput, MousePressState};
 use macroquad::prelude::*;
 
@@ -9,14 +11,14 @@ pub struct Data {
 impl Default for Data {
     fn default() -> Self {
         Data {
-            angle: 1.0,
+            angle: -1.5,
             is_draging: false,
         }
     }
 }
 
-const CRANK_CENTER: Vec2 = Vec2::new(300.0, 400.0);
-const CRANK_LENGTH: f32 = 200.0;
+const CRANK_CENTER: Vec2 = Vec2::new(100.0, 700.0);
+const CRANK_LENGTH: f32 = 380.0;
 
 pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
     let crank_off = Vec2::from_angle(data.angle) * CRANK_LENGTH;
@@ -34,17 +36,40 @@ pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
     let angle_to_mouse = crank_off.angle_between(input.mouse_position - CRANK_CENTER);
 
     if data.is_draging {
-        data.angle += clamp(angle_to_mouse, 0.0, delta * 10.0);
+        data.angle += clamp(angle_to_mouse, 0.0, delta * 1.0);
     }
-    data.angle = data.angle.clamp(1.0, 7.0);
+    data.angle = data.angle.clamp(-1.5, -0.5);
 
-    data.angle >= 7.0
+    data.angle >= -0.5
 }
 
-pub fn draw(data: &Data) {
-    clear_background(WHITE);
-    let crank_off = Vec2::from_angle(data.angle) * CRANK_LENGTH;
-    draw_circle(
+pub fn draw(data: &Data, textures: &HashMap<&str, Texture2D>) {
+    clear_background(BLACK);
+
+    draw_texture(
+        textures.get("crank_door").unwrap(),
+        496.0,
+        164.0 - 200.0 * ((data.angle + 1.5) / 1.0),
+        WHITE,
+    );
+    draw_texture(textures.get("crank_bkgd").unwrap(), 0.0, 0.0, WHITE);
+
+    let crank_draw_params = DrawTextureParams {
+        rotation: data.angle,
+        //pivot: Some(CRANK_CENTER),
+        ..Default::default()
+    };
+
+    let crank_off = Vec2::from_angle(data.angle) * (CRANK_LENGTH - 165.0);
+
+    draw_texture_ex(
+        textures.get("crank_handle").unwrap(),
+        crank_off.x + CRANK_CENTER.x - 200.0,
+        crank_off.y + CRANK_CENTER.y - 72.0,
+        WHITE,
+        crank_draw_params,
+    );
+    /*draw_circle(
         crank_off.x + CRANK_CENTER.x,
         crank_off.y + CRANK_CENTER.y,
         50.0,
@@ -56,5 +81,5 @@ pub fn draw(data: &Data) {
         CRANK_CENTER.y,
         32.0,
         BLACK,
-    );
+    );*/
 }

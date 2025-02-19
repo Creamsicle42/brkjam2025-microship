@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use game::{draw_game_state, gather_frame_input, init_game_state, update_game_state};
 use macroquad::{prelude::*, rand, time, window::Conf};
 
@@ -17,8 +15,13 @@ fn game_config() -> Conf {
 
 #[macroquad::main(game_config)]
 async fn main() {
-    let mut state = init_game_state();
     rand::srand(time::get_time() as u64);
+
+    clear_background(BLACK);
+    draw_text("Loading...", 16.0, 48.0, 32.0, WHITE);
+    next_frame().await;
+
+    let mut state = init_game_state().await;
 
     'game: loop {
         let res = update_game_state(&mut state, gather_frame_input(), get_frame_time());

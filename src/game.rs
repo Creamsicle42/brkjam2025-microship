@@ -72,7 +72,7 @@ macro_rules! include_texture {
     };
 }
 
-pub fn init_game_state() -> GameState {
+pub async fn init_game_state() -> GameState {
     let mut textures: HashMap<&str, Texture2D> = HashMap::new();
 
     include_texture!(textures, "right_door", "../assets/right_door.png");
@@ -148,7 +148,11 @@ pub fn init_game_state() -> GameState {
         "../assets/imposter_imposter_bloody.png"
     );
 
-    build_textures_atlas();
+    include_texture!(textures, "crank_bkgd", "../assets/crank_bkgd.png");
+    include_texture!(textures, "crank_door", "../assets/crank_door.png");
+    include_texture!(textures, "crank_handle", "../assets/crank_handle.png");
+
+    //build_textures_atlas();
 
     GameState {
         textures,
