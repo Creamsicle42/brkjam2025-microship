@@ -139,7 +139,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
             Microgames::AlwaysWin(d) => always_win::draw(d),
             Microgames::Pipes(d) => pipes::draw(d, &game_data.textures),
             Microgames::Combo(d) => combo::draw(d, &game_data.textures),
-            Microgames::Course(d) => course::draw(d),
+            Microgames::Course(d) => course::draw(d, &game_data.textures),
             Microgames::Sweep(d) => sweep::draw(d),
             Microgames::Asteroids(d) => asteroids::draw(d),
             Microgames::Imposter(d) => imposter::draw(d),

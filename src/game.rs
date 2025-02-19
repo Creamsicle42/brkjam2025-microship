@@ -63,33 +63,24 @@ pub fn gather_frame_input() -> FrameInput {
     }
 }
 
+macro_rules! include_texture {
+    ($map: ident, $tex: literal, $path: literal) => {
+        $map.insert(
+            $tex,
+            Texture2D::from_file_with_format(include_bytes!($path), None),
+        );
+    };
+}
+
 pub fn init_game_state() -> GameState {
     let mut textures: HashMap<&str, Texture2D> = HashMap::new();
 
-    textures.insert(
-        "right_door",
-        Texture2D::from_file_with_format(include_bytes!("../assets/right_door.png"), None),
-    );
-    textures.insert(
-        "left_door",
-        Texture2D::from_file_with_format(include_bytes!("../assets/left_door.png"), None),
-    );
-    textures.insert(
-        "pipes_bkgd",
-        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_bkgd.png"), None),
-    );
-    textures.insert(
-        "pipes_patch_1",
-        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_patch_1.png"), None),
-    );
-    textures.insert(
-        "pipes_patch_2",
-        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_patch_2.png"), None),
-    );
-    textures.insert(
-        "pipes_patch_3",
-        Texture2D::from_file_with_format(include_bytes!("../assets/pipes_patch_3.png"), None),
-    );
+    include_texture!(textures, "right_door", "../assets/right_door.png");
+    include_texture!(textures, "left_door", "../assets/left_door.png");
+    include_texture!(textures, "pipes_bkgd", "../assets/pipes_bkgd.png");
+    include_texture!(textures, "pipes_patch_1", "../assets/pipes_patch_1.png");
+    include_texture!(textures, "pipes_patch_2", "../assets/pipes_patch_2.png");
+    include_texture!(textures, "pipes_patch_3", "../assets/pipes_patch_3.png");
     textures.insert(
         "combo_bkgd",
         Texture2D::from_file_with_format(include_bytes!("../assets/combo_bkgd.png"), None),
@@ -126,6 +117,13 @@ pub fn init_game_state() -> GameState {
         "combo_green_4",
         Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_4.png"), None),
     );
+
+    include_texture!(textures, "course_bkgd", "../assets/course_bkgd.png");
+    include_texture!(textures, "course_temp_0", "../assets/course_xlow.png");
+    include_texture!(textures, "course_temp_1", "../assets/course_low.png");
+    include_texture!(textures, "course_temp_2", "../assets/course_good.png");
+    include_texture!(textures, "course_temp_3", "../assets/course_high.png");
+    include_texture!(textures, "course_temp_4", "../assets/course_xhigh.png");
 
     build_textures_atlas();
 
