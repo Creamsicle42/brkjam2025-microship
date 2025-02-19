@@ -5,7 +5,7 @@ use super::{
         always_win, asteroids, combo, course, crank, gen_microgame, gen_microgame_queue,
         gen_new_microgame, imposter, pipes, swap, sweep, Microgames,
     },
-    FrameInput, GameEvents, GameState, MousePressState,
+    particles_draw, particles_update, FrameInput, GameEvents, GameState, MousePressState,
 };
 use macroquad::prelude::*;
 
@@ -147,6 +147,8 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
             Microgames::Crank(d) => crank::draw(d, &game_data.textures),
             _ => {}
         }
+
+        // Particles
 
         // Draw UI
         if let MicrogameState::InMicrogame(t) = gs_data.microgame_state {

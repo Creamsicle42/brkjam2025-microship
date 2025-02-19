@@ -1,5 +1,5 @@
 #![allow(dead_code, unused)]
-use std::collections::HashMap;
+use std::{collections::HashMap, usize};
 
 use gameplay::InGameData;
 use macroquad::prelude::*;
@@ -27,6 +27,7 @@ enum ActiveState {
 pub struct GameState {
     active_state: ActiveState,
     textures: HashMap<&'static str, Texture2D>,
+    smoke_particle: Texture2D,
 }
 
 #[derive(Debug, PartialEq)]
@@ -39,6 +40,52 @@ enum MousePressState {
 pub struct FrameInput {
     mouse_position: Vec2,
     mouse_state: MousePressState,
+}
+
+pub struct Particle {
+    pub position: Vec2,
+    pub velocity: Vec2,
+    pub rotation: f32,
+    pub ang_velocity: f32,
+    pub lifetime: f32,
+    pub color: Color,
+    pub color_delta: Color,
+}
+
+pub fn particles_update(particles: &mut Vec<Particle>, delta: &f32) {
+    let mut remove_queue: Vec<usize> = vec![];
+    for (p, i) in particles.iter_mut().zip(0..) {
+        p.position += p.velocity * *delta;
+        p.rotation += p.ang_velocity * *delta;
+        p.color.r += p.color_delta.r * *delta;
+        p.color.g += p.color_delta.g * *delta;
+        p.color.b += p.color_delta.b * *delta;
+        p.color.a += p.color_delta.a * *delta;
+        p.lifetime -= *delta;
+        if p.lifetime <= 0.0 {
+            remove_queue.push(i);
+        }
+    }
+    for i in remove_queue.into_iter().rev() {
+        particles.swap_remove(i);
+    }
+}
+
+pub fn particles_draw(particles: &Vec<Particle>, tex: &Texture2D) {
+    let w = tex.width() / 2.0;
+    let h = tex.height() / 2.0;
+    for p in particles.iter() {
+        draw_texture_ex(
+            tex,
+            p.position.x - w,
+            p.position.y - h,
+            p.color,
+            DrawTextureParams {
+                rotation: p.rotation,
+                ..Default::default()
+            },
+        );
+    }
 }
 
 pub fn vec2_in_range(v: &Vec2, r: &(Vec2, Vec2)) -> bool {
@@ -177,9 +224,15 @@ pub async fn init_game_state() -> GameState {
     include_texture!(textures, "sweep_frame_2", "../assets/sweep_frame_2.png");
     include_texture!(textures, "sweep_frame_3", "../assets/sweep_frame_3.png");
 
+    include_texture!(textures, "smoke_particle", "../assets/smoke_particle.png");
+
     //build_textures_atlas();
 
     GameState {
+        smoke_particle: Texture2D::from_file_with_format(
+            include_bytes!("../assets/smoke_particle.png"),
+            None,
+        ),
         textures,
         active_state: ActiveState::MainMenu(MainMenuData::default()),
     }
