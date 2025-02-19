@@ -130,6 +130,24 @@ pub fn init_game_state() -> GameState {
     include_texture!(textures, "swap_can_1", "../assets/swap_medium.png");
     include_texture!(textures, "swap_can_2", "../assets/swap_tall.png");
 
+    include_texture!(textures, "imposter_bkgd", "../assets/imposter_bkgd.png");
+    include_texture!(textures, "imposter_human", "../assets/imposter_human.png");
+    include_texture!(
+        textures,
+        "imposter_human_bloody",
+        "../assets/imposter_human_bloody.png"
+    );
+    include_texture!(
+        textures,
+        "imposter_imposter",
+        "../assets/imposter_imposter.png"
+    );
+    include_texture!(
+        textures,
+        "imposter_imposter_bloody",
+        "../assets/imposter_imposter_bloody.png"
+    );
+
     build_textures_atlas();
 
     GameState {

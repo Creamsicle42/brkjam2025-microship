@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::game::{FrameInput, MousePressState};
 use macroquad::prelude::*;
 use rand::gen_range;
@@ -51,32 +53,21 @@ pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
     data.imposter_selected == data.imposter_slot as i8
 }
 
-pub fn draw(data: &Data) {
-    clear_background(WHITE);
+pub fn draw(data: &Data, textures: &HashMap<&str, Texture2D>) {
+    draw_texture(textures.get("imposter_bkgd").unwrap(), 0.0, 0.0, WHITE);
     for i in 0..4 {
-        draw_rectangle(
-            SEL_AREAS[i].0.x,
-            SEL_AREAS[i].0.y,
-            SEL_AREAS[i].1.x - SEL_AREAS[i].0.x,
-            SEL_AREAS[i].1.y - SEL_AREAS[i].0.y,
-            if data.imposter_selected == i as i8 {
-                GREEN
-            } else {
-                RED
-            },
+        let tex_id = match (data.imposter_selected == i, data.imposter_slot == i as u8) {
+            (true, true) => "imposter_imposter_bloody",
+            (true, false) => "imposter_human_bloody",
+            (false, true) => "imposter_imposter",
+            (false, false) => "imposter_human",
+        };
+
+        draw_texture(
+            textures.get(tex_id).unwrap(),
+            70.0 + 240.0 * i as f32,
+            246.0,
+            WHITE,
         );
-        if data.imposter_hilighted == i as i8 && data.imposter_selected == -1 {
-            draw_rectangle_lines(
-                SEL_AREAS[i].0.x,
-                SEL_AREAS[i].0.y,
-                SEL_AREAS[i].1.x - SEL_AREAS[i].0.x,
-                SEL_AREAS[i].1.y - SEL_AREAS[i].0.y,
-                16.0,
-                GREEN,
-            );
-        }
-        if data.imposter_slot == i as u8 {
-            draw_text("IMPOSTER", SEL_AREAS[i].0.x, SEL_AREAS[i].0.y, 16.0, BLACK);
-        }
     }
 }
