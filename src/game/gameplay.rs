@@ -141,7 +141,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
             Microgames::Combo(d) => combo::draw(d, &game_data.textures),
             Microgames::Course(d) => course::draw(d, &game_data.textures),
             Microgames::Sweep(d) => sweep::draw(d),
-            Microgames::Asteroids(d) => asteroids::draw(d),
+            Microgames::Asteroids(d) => asteroids::draw(d, &game_data.textures),
             Microgames::Imposter(d) => imposter::draw(d, &game_data.textures),
             Microgames::Swap(d) => swap::draw(d, &game_data.textures),
             Microgames::Crank(d) => crank::draw(d, &game_data.textures),

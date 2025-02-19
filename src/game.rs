@@ -152,6 +152,25 @@ pub async fn init_game_state() -> GameState {
     include_texture!(textures, "crank_door", "../assets/crank_door.png");
     include_texture!(textures, "crank_handle", "../assets/crank_handle.png");
 
+    include_texture!(textures, "asteroids_bkgd", "../assets/asteroids_bkgd.png");
+    include_texture!(
+        textures,
+        "asteroids_lazer_green",
+        "../assets/asteroids_green_lazer.png"
+    );
+    include_texture!(
+        textures,
+        "asteroids_lazer_red",
+        "../assets/asteroids_red_lazer.png"
+    );
+    include_texture!(
+        textures,
+        "asteroids_asteroid",
+        "../assets/asteroids_asteroid.png"
+    );
+    include_texture!(textures, "asteroids_chunk", "../assets/asteroids_chunk.png");
+    include_texture!(textures, "asteroids_beam", "../assets/asteroids_beam.png");
+
     //build_textures_atlas();
 
     GameState {
