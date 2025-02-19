@@ -1,3 +1,5 @@
+use std::{collections::HashMap, usize};
+
 use crate::game::{vec2_in_range, FrameInput, MousePressState};
 use macroquad::prelude::*;
 use rand::ChooseRandom;
@@ -26,15 +28,8 @@ pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
         .zip(0..3)
         .map(|(val, i)| {
             (
-                Vec2::new(
-                    100.0 + i as f32 * 150.0,
-                    200.0 + 50.0 * *val as f32
-                        - (if data.selected == i as i8 { 25.0 } else { 0.0 }),
-                ),
-                Vec2::new(
-                    200.0 + i as f32 * 150.0,
-                    650.0 - (if data.selected == i as i8 { 25.0 } else { 0.0 }),
-                ),
+                Vec2::new(30.0 + i as f32 * 310.0, 80.0),
+                Vec2::new(320.0 + i as f32 * 310.0, 650.0),
             )
         })
         .collect();
@@ -59,30 +54,21 @@ pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
         }
     }
 
-    data.order[0] > data.order[1] && data.order[1] > data.order[2]
+    data.order[0] < data.order[1] && data.order[1] < data.order[2]
 }
 
-pub fn draw(data: &Data) {
-    clear_background(WHITE);
-    let mut click_boxes: Vec<(Vec2, Vec2)> = data
-        .order
-        .iter()
-        .zip(0..3)
-        .map(|(val, i)| {
-            (
-                Vec2::new(
-                    100.0 + i as f32 * 150.0,
-                    200.0 + 50.0 * *val as f32
-                        - (if data.selected == i as i8 { 25.0 } else { 0.0 }),
-                ),
-                Vec2::new(
-                    200.0 + i as f32 * 150.0,
-                    650.0 - (if data.selected == i as i8 { 25.0 } else { 0.0 }),
-                ),
-            )
-        })
-        .collect();
-    for (rl, br) in click_boxes.iter() {
-        draw_rectangle(rl.x, rl.y, br.x - rl.x, br.y - rl.y, RED);
+const BOX_OFFSETS: [f32; 3] = [233.0, 152.0, 80.0];
+
+pub fn draw(data: &Data, textures: &HashMap<&str, Texture2D>) {
+    draw_texture(textures.get("swap_bkgd").unwrap(), 0.0, 0.0, WHITE);
+    for (height, index) in data.order.iter().zip(0..3) {
+        draw_texture(
+            textures
+                .get(format!("swap_can_{}", height).as_str())
+                .unwrap(),
+            30.0 + 310.0 * index as f32,
+            BOX_OFFSETS[*height as usize] - if (data.selected == index) { 40.0 } else { 0.0 },
+            WHITE,
+        );
     }
 }

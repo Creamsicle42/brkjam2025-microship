@@ -125,6 +125,11 @@ pub fn init_game_state() -> GameState {
     include_texture!(textures, "course_temp_3", "../assets/course_high.png");
     include_texture!(textures, "course_temp_4", "../assets/course_xhigh.png");
 
+    include_texture!(textures, "swap_bkgd", "../assets/swap_bkgd.png");
+    include_texture!(textures, "swap_can_0", "../assets/swap_small.png");
+    include_texture!(textures, "swap_can_1", "../assets/swap_medium.png");
+    include_texture!(textures, "swap_can_2", "../assets/swap_tall.png");
+
     build_textures_atlas();
 
     GameState {
