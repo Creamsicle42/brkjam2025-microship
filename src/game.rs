@@ -171,6 +171,12 @@ pub async fn init_game_state() -> GameState {
     include_texture!(textures, "asteroids_chunk", "../assets/asteroids_chunk.png");
     include_texture!(textures, "asteroids_beam", "../assets/asteroids_beam.png");
 
+    include_texture!(textures, "sweep_bkgd", "../assets/sweep_bkgnd.png");
+    include_texture!(textures, "sweep_handle", "../assets/sweep_handle.png");
+    include_texture!(textures, "sweep_frame_1", "../assets/sweep_frame_1.png");
+    include_texture!(textures, "sweep_frame_2", "../assets/sweep_frame_2.png");
+    include_texture!(textures, "sweep_frame_3", "../assets/sweep_frame_3.png");
+
     //build_textures_atlas();
 
     GameState {
