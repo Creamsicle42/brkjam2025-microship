@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::game::{FrameInput, MousePressState};
+use crate::game::{particles_draw, particles_update, FrameInput, MousePressState, Particle};
 use macroquad::prelude::*;
 use rand::gen_range;
 
@@ -14,6 +14,7 @@ pub struct Data {
     lazer_cooltime: f32,
     chunks_pos: Vec<Vec2>,
     chunks_vel: Vec<Vec2>,
+    particles: Vec<Particle>,
 }
 
 impl Default for Data {
@@ -28,6 +29,7 @@ impl Default for Data {
             lazer_cooltime: 0.0,
             chunks_pos: vec![],
             chunks_vel: vec![],
+            particles: vec![],
         }
     }
 }
@@ -60,8 +62,32 @@ pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
                 data.chunks_vel
                     .push(Vec2::new(gen_range(-50.0, 50.0), gen_range(-50.0, 50.0)));
             }
+            for _ in 0..32 {
+                data.particles.push(Particle {
+                    position: data.asteroid_pos
+                        + Vec2::new(gen_range(-50.0, 50.0), gen_range(-50.0, 50.0)),
+                    velocity: Vec2::new(gen_range(-50.0, 50.0), gen_range(-50.0, 50.0)),
+                    rotation: gen_range(0.0, 6.2),
+                    ang_velocity: gen_range(-1.0, 1.0),
+                    color: Color {
+                        r: 0.8,
+                        g: 0.4,
+                        b: 0.4,
+                        a: 0.5,
+                    },
+                    color_delta: Color {
+                        r: 0.0,
+                        g: 0.0,
+                        b: 0.0,
+                        a: -0.1,
+                    },
+                    lifetime: 0.5,
+                });
+            }
         }
     }
+
+    particles_update(&mut data.particles, &delta);
 
     for (pos, vel) in data.chunks_pos.iter_mut().zip(data.chunks_vel.iter_mut()) {
         *pos += *vel * delta;
@@ -118,4 +144,6 @@ pub fn draw(data: &Data, textures: &HashMap<&str, Texture2D>) {
             },
         );
     }
+
+    particles_draw(&data.particles, textures.get("smoke_particle").unwrap());
 }
