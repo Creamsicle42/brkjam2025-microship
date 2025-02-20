@@ -114,56 +114,28 @@ macro_rules! include_texture {
     ($map: ident, $tex: literal, $path: literal) => {
         $map.insert(
             $tex,
-            Texture2D::from_file_with_format(include_bytes!($path), None),
+            Image::from_file_with_format(include_bytes!($path), Some(ImageFormat::Png)).unwrap(),
         );
     };
 }
 
-pub async fn init_game_state() -> GameState {
-    let mut textures: HashMap<&str, Texture2D> = HashMap::new();
-
+pub fn get_texture_images() -> HashMap<&'static str, Image> {
+    let mut textures: HashMap<&str, Image> = HashMap::new();
     include_texture!(textures, "right_door", "../assets/right_door.png");
     include_texture!(textures, "left_door", "../assets/left_door.png");
     include_texture!(textures, "pipes_bkgd", "../assets/pipes_bkgd.png");
     include_texture!(textures, "pipes_patch_1", "../assets/pipes_patch_1.png");
     include_texture!(textures, "pipes_patch_2", "../assets/pipes_patch_2.png");
     include_texture!(textures, "pipes_patch_3", "../assets/pipes_patch_3.png");
-    textures.insert(
-        "combo_bkgd",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_bkgd.png"), None),
-    );
-    textures.insert(
-        "combo_red_1",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_1.png"), None),
-    );
-    textures.insert(
-        "combo_red_2",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_2.png"), None),
-    );
-    textures.insert(
-        "combo_red_3",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_3.png"), None),
-    );
-    textures.insert(
-        "combo_red_4",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_red_4.png"), None),
-    );
-    textures.insert(
-        "combo_green_1",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_1.png"), None),
-    );
-    textures.insert(
-        "combo_green_2",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_2.png"), None),
-    );
-    textures.insert(
-        "combo_green_3",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_3.png"), None),
-    );
-    textures.insert(
-        "combo_green_4",
-        Texture2D::from_file_with_format(include_bytes!("../assets/combo_green_4.png"), None),
-    );
+    include_texture!(textures, "combo_bkgd", "../assets/combo_bkgd.png");
+    include_texture!(textures, "combo_red_1", "../assets/combo_red_1.png");
+    include_texture!(textures, "combo_red_2", "../assets/combo_red_2.png");
+    include_texture!(textures, "combo_red_3", "../assets/combo_red_3.png");
+    include_texture!(textures, "combo_red_4", "../assets/combo_red_4.png");
+    include_texture!(textures, "combo_green_1", "../assets/combo_green_1.png");
+    include_texture!(textures, "combo_green_2", "../assets/combo_green_2.png");
+    include_texture!(textures, "combo_green_3", "../assets/combo_green_3.png");
+    include_texture!(textures, "combo_green_4", "../assets/combo_green_4.png");
 
     include_texture!(textures, "course_bkgd", "../assets/course_bkgd.png");
     include_texture!(textures, "course_temp_0", "../assets/course_xlow.png");
@@ -225,6 +197,16 @@ pub async fn init_game_state() -> GameState {
     include_texture!(textures, "sweep_frame_3", "../assets/sweep_frame_3.png");
 
     include_texture!(textures, "smoke_particle", "../assets/smoke_particle.png");
+
+    return textures;
+}
+
+pub fn init_game_state(images: HashMap<&'static str, Image>) -> GameState {
+    let mut textures: HashMap<&str, Texture2D> = HashMap::new();
+
+    for (id, img) in images.iter() {
+        textures.insert(id, Texture2D::from_image(img));
+    }
 
     //build_textures_atlas();
 

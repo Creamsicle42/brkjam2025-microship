@@ -1,5 +1,9 @@
-use game::{draw_game_state, gather_frame_input, init_game_state, update_game_state};
+use game::{
+    draw_game_state, gather_frame_input, get_texture_images, init_game_state, update_game_state,
+    GameState,
+};
 use macroquad::{prelude::*, rand, time, window::Conf};
+use std::{sync::mpsc, thread};
 
 mod game;
 
@@ -17,11 +21,31 @@ fn game_config() -> Conf {
 async fn main() {
     rand::srand(time::get_time() as u64);
 
-    clear_background(BLACK);
-    draw_text("Loading...", 16.0, 48.0, 32.0, WHITE);
-    next_frame().await;
+    let (tx, rx) = mpsc::channel();
 
-    let mut state = init_game_state().await;
+    let _ = thread::spawn(move || {
+        let _ = tx.send(get_texture_images());
+    });
+
+    let mut state: GameState;
+    let mut load_time = 0.0;
+
+    'load: loop {
+        if let Ok(t) = rx.try_recv() {
+            state = init_game_state(t);
+            break 'load;
+        }
+        load_time += get_frame_time();
+        clear_background(BLACK);
+        draw_text(
+            "Loading...",
+            16.0,
+            64.0 + 16.0 * load_time.sin(),
+            32.0,
+            WHITE,
+        );
+        next_frame().await;
+    }
 
     'game: loop {
         let res = update_game_state(&mut state, gather_frame_input(), get_frame_time());
