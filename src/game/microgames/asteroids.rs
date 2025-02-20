@@ -66,7 +66,7 @@ pub fn update(data: &mut Data, input: FrameInput, delta: f32) -> bool {
                 data.particles.push(Particle {
                     position: data.asteroid_pos
                         + Vec2::new(gen_range(-50.0, 50.0), gen_range(-50.0, 50.0)),
-                    velocity: Vec2::new(gen_range(-50.0, 50.0), gen_range(-50.0, 50.0)),
+                    velocity: Vec2::new(gen_range(-200.0, 200.0), gen_range(-200.0, 200.0)),
                     rotation: gen_range(0.0, 6.2),
                     ang_velocity: gen_range(-1.0, 1.0),
                     color: Color {

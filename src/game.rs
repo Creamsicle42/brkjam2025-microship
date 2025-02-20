@@ -54,13 +54,14 @@ pub struct Particle {
 
 pub fn particles_update(particles: &mut Vec<Particle>, delta: &f32) {
     let mut remove_queue: Vec<usize> = vec![];
+    let d = *delta;
     for (p, i) in particles.iter_mut().zip(0..) {
-        p.position += p.velocity * *delta;
-        p.rotation += p.ang_velocity * *delta;
+        p.position += p.velocity * d;
+        p.rotation += p.ang_velocity * d;
         p.color.r += p.color_delta.r * *delta;
         p.color.g += p.color_delta.g * *delta;
         p.color.b += p.color_delta.b * *delta;
-        p.color.a += p.color_delta.a * *delta;
+        p.color.a = p.color.a - (1.0 * d);
         p.lifetime -= *delta;
         if p.lifetime <= 0.0 {
             remove_queue.push(i);
