@@ -8,7 +8,7 @@ use macroquad::{
     rand, time,
     window::Conf,
 };
-use std::{collections::HashMap, sync::mpsc, thread};
+use std::{collections::HashMap, sync::mpsc, thread, time::SystemTime};
 
 mod game;
 
@@ -24,7 +24,12 @@ fn game_config() -> Conf {
 
 #[macroquad::main(game_config)]
 async fn main() {
-    rand::srand(time::get_time() as u64);
+    rand::srand(
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs(),
+    );
 
     let (tx, rx) = mpsc::channel();
 

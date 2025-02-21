@@ -49,7 +49,7 @@ impl Default for InGameData {
             microgames_completed: 0,
             lives: 3,
             current_microgame_win: false,
-            microgame_state: MicrogameState::TransIn(0.5),
+            microgame_state: MicrogameState::TransIn(1.0),
             current_microgame: gen_microgame(game_queue.pop().unwrap()),
             game_queue,
         }
