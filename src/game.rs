@@ -2,7 +2,10 @@
 use std::{collections::HashMap, usize};
 
 use gameplay::InGameData;
-use macroquad::prelude::*;
+use macroquad::{
+    audio::{load_sound_from_bytes, play_sound_once, stop_sound, Sound},
+    prelude::*,
+};
 use main_menu::MainMenuData;
 
 mod gameplay;
@@ -113,7 +116,7 @@ impl TransState {
 pub struct GameState {
     active_state: ActiveState,
     textures: HashMap<&'static str, Texture2D>,
-    smoke_particle: Texture2D,
+    song: Sound,
 }
 
 #[derive(Debug, PartialEq)]
@@ -126,6 +129,11 @@ enum MousePressState {
 pub struct FrameInput {
     mouse_position: Vec2,
     mouse_state: MousePressState,
+}
+
+pub enum ThreadLoadResource {
+    Textures(HashMap<&'static str, Image>),
+    MainSong(Sound),
 }
 
 pub struct Particle {
@@ -307,7 +315,13 @@ pub fn get_texture_images() -> HashMap<&'static str, Image> {
     return textures;
 }
 
-pub fn init_game_state(images: HashMap<&'static str, Image>) -> GameState {
+pub async fn load_song() -> Sound {
+    return load_sound_from_bytes(include_bytes!("../assets/song.ogg"))
+        .await
+        .unwrap();
+}
+
+pub fn init_game_state(images: HashMap<&'static str, Image>, song: Sound) -> GameState {
     let mut textures: HashMap<&str, Texture2D> = HashMap::new();
 
     for (id, img) in images.iter() {
@@ -317,10 +331,7 @@ pub fn init_game_state(images: HashMap<&'static str, Image>) -> GameState {
     //build_textures_atlas();
 
     GameState {
-        smoke_particle: Texture2D::from_file_with_format(
-            include_bytes!("../assets/smoke_particle.png"),
-            None,
-        ),
+        song,
         textures,
         active_state: ActiveState::MainMenu(MainMenuData::default()),
     }
@@ -351,6 +362,7 @@ pub fn update_game_state(
     if events.contains(&GameEvents::StartGameplay) {
         let mut new_game_state = InGameData::default();
         state.active_state = ActiveState::InGame(new_game_state);
+        play_sound_once(&state.song);
     };
 
     if events.contains(&GameEvents::GameWon) {
@@ -367,6 +379,7 @@ pub fn update_game_state(
 
     if events.contains(&GameEvents::MainMenuReturn) {
         state.active_state = ActiveState::MainMenu(MainMenuData::default());
+        stop_sound(&state.song);
     }
 
     return out;

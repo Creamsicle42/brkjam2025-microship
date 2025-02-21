@@ -1,9 +1,14 @@
 use game::{
-    draw_game_state, gather_frame_input, get_texture_images, init_game_state, update_game_state,
-    GameState,
+    draw_game_state, gather_frame_input, get_texture_images, init_game_state, load_song,
+    update_game_state, GameState, ThreadLoadResource,
 };
-use macroquad::{prelude::*, rand, time, window::Conf};
-use std::{sync::mpsc, thread};
+use macroquad::{
+    audio::{load_sound_from_bytes, Sound},
+    prelude::*,
+    rand, time,
+    window::Conf,
+};
+use std::{collections::HashMap, sync::mpsc, thread};
 
 mod game;
 
@@ -28,25 +33,28 @@ async fn main() {
     });
 
     let mut state: GameState;
-    let mut load_time = 0.0;
+    {
+        let mut load_time = 0.0;
 
-    'load: loop {
-        if let Ok(t) = rx.try_recv() {
-            state = init_game_state(t);
-            break 'load;
+        'load: loop {
+            if let Ok(t) = rx.try_recv() {
+                let songfut = load_song();
+
+                state = init_game_state(t, songfut.await);
+                break 'load;
+            }
+            load_time += get_frame_time();
+            clear_background(BLACK);
+            draw_text(
+                "Loading...",
+                16.0,
+                64.0 + 16.0 * load_time.sin(),
+                32.0,
+                WHITE,
+            );
+            next_frame().await;
         }
-        load_time += get_frame_time();
-        clear_background(BLACK);
-        draw_text(
-            "Loading...",
-            16.0,
-            64.0 + 16.0 * load_time.sin(),
-            32.0,
-            WHITE,
-        );
-        next_frame().await;
     }
-
     'game: loop {
         let res = update_game_state(&mut state, gather_frame_input(), get_frame_time());
         if res.is_err() {
