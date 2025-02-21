@@ -199,6 +199,22 @@ pub fn get_texture_images() -> HashMap<&'static str, Image> {
 
     include_texture!(textures, "smoke_particle", "../assets/smoke_particle.png");
 
+    include_texture!(
+        textures,
+        "title_screen_bkgd",
+        "../assets/title_screen_bkgd.png"
+    );
+    include_texture!(
+        textures,
+        "title_screen_button_red",
+        "../assets/title_screen_button_red.png"
+    );
+    include_texture!(
+        textures,
+        "title_screen_button_green",
+        "../assets/title_screen_button_green.png"
+    );
+
     return textures;
 }
 
