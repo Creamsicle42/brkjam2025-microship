@@ -6,6 +6,7 @@ use super::{ActiveState, FrameInput, GameEvents, GameState, MousePressState};
 enum TransState {
     None,
     Out(f32),
+    In(f32),
 }
 
 pub struct MainMenuData {
@@ -19,7 +20,7 @@ impl Default for MainMenuData {
         MainMenuData {
             play_button_hover: false,
             mouse_pos: Vec2::ZERO,
-            t_state: TransState::None,
+            t_state: TransState::In(0.5),
         }
     }
 }
@@ -57,6 +58,13 @@ pub fn update(
                     events.push(GameEvents::StartGameplay);
                 };
                 TransState::Out(t - delta)
+            }
+            TransState::In(t) => {
+                if *t <= 0.0 {
+                    TransState::None
+                } else {
+                    TransState::In(t - delta)
+                }
             }
             TransState::None => TransState::None,
         };
@@ -96,11 +104,11 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
             );
         }
 
+        let r_door = game_data.textures.get("right_door").unwrap();
+        let l_door = game_data.textures.get("left_door").unwrap();
         match mm_data.t_state {
             TransState::Out(t) => {
                 let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
-                let r_door = game_data.textures.get("right_door").unwrap();
-                let l_door = game_data.textures.get("left_door").unwrap();
                 draw_texture(
                     l_door,
                     lerp(-500.0, 0.0, raw_progress * raw_progress),
@@ -110,6 +118,21 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
                 draw_texture(
                     r_door,
                     lerp(1000.0, 462.0, raw_progress * raw_progress),
+                    0.0,
+                    WHITE,
+                );
+            }
+            TransState::In(t) => {
+                let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
+                draw_texture(
+                    l_door,
+                    lerp(0.0, -500.0, raw_progress * raw_progress),
+                    0.0,
+                    WHITE,
+                );
+                draw_texture(
+                    r_door,
+                    lerp(462.0, 1000.0, raw_progress * raw_progress),
                     0.0,
                     WHITE,
                 );

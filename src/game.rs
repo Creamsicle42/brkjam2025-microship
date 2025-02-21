@@ -17,11 +17,97 @@ pub enum GameEvents {
     MainMenuReturn,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum TransState {
+    None,
+    TransIn(f32),
+    TransOut(f32),
+}
+
+struct WinLooseData {
+    trans_state: TransState,
+}
+
 enum ActiveState {
     MainMenu(MainMenuData),
     InGame(InGameData),
-    WinScreen,
-    LoseScreen,
+    WinScreen(WinLooseData),
+    LoseScreen(WinLooseData),
+}
+
+impl TransState {
+    fn draw_doors(&self, textures: &HashMap<&str, Texture2D>) {
+        let r_door = textures.get("right_door").unwrap();
+        let l_door = textures.get("left_door").unwrap();
+        fn lerp(f: f32, t: f32, d: f32) -> f32 {
+            t * d + f * (1.0 - d)
+        }
+
+        match self {
+            TransState::TransIn(t) => {
+                let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
+                draw_texture(
+                    l_door,
+                    lerp(0.0, -500.0, raw_progress * raw_progress),
+                    0.0,
+                    WHITE,
+                );
+                draw_texture(
+                    r_door,
+                    lerp(462.0, 1000.0, raw_progress * raw_progress),
+                    0.0,
+                    WHITE,
+                );
+            }
+            TransState::TransOut(t) => {
+                let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
+                draw_texture(
+                    l_door,
+                    lerp(-500.0, 0.0, raw_progress * raw_progress),
+                    0.0,
+                    WHITE,
+                );
+                draw_texture(
+                    r_door,
+                    lerp(1000.0, 462.0, raw_progress * raw_progress),
+                    0.0,
+                    WHITE,
+                );
+            }
+            _ => {}
+        };
+    }
+    fn update(
+        self,
+        deltatime: f32,
+        events: &mut Vec<GameEvents>,
+        input: &FrameInput,
+    ) -> TransState {
+        match self {
+            TransState::None => {
+                if input.mouse_state == MousePressState::JustPressed {
+                    TransState::TransOut(0.5)
+                } else {
+                    TransState::None
+                }
+            }
+            TransState::TransIn(time) => {
+                if time > 0.0 {
+                    TransState::TransIn(time - deltatime)
+                } else {
+                    TransState::None
+                }
+            }
+            TransState::TransOut(time) => {
+                if time > 0.0 {
+                    TransState::TransOut(time - deltatime)
+                } else {
+                    events.push(GameEvents::MainMenuReturn);
+                    TransState::None
+                }
+            }
+        }
+    }
 }
 
 pub struct GameState {
@@ -215,6 +301,9 @@ pub fn get_texture_images() -> HashMap<&'static str, Image> {
         "../assets/title_screen_button_green.png"
     );
 
+    include_texture!(textures, "lose_screen", "../assets/lose_screen.png");
+    include_texture!(textures, "win_screen", "../assets/win_screen.png");
+
     return textures;
 }
 
@@ -246,10 +335,14 @@ pub fn update_game_state(
     let out = match &state.active_state {
         ActiveState::MainMenu(_) => main_menu::update(state, input, deltatime, &mut events),
         ActiveState::InGame(_) => gameplay::update(state, input, deltatime, &mut events),
-        ActiveState::WinScreen | ActiveState::LoseScreen => {
-            if input.mouse_state == MousePressState::JustPressed {
-                events.push(GameEvents::MainMenuReturn);
+        ActiveState::WinScreen(_) | ActiveState::LoseScreen(_) => {
+            if let ActiveState::WinScreen(t) = &mut state.active_state {
+                t.trans_state = t.trans_state.update(deltatime, &mut events, &input);
             }
+            if let ActiveState::LoseScreen(t) = &mut state.active_state {
+                t.trans_state = t.trans_state.update(deltatime, &mut events, &input);
+            }
+
             Ok(())
         }
         _ => todo!(),
@@ -261,11 +354,15 @@ pub fn update_game_state(
     };
 
     if events.contains(&GameEvents::GameWon) {
-        state.active_state = ActiveState::WinScreen;
+        state.active_state = ActiveState::WinScreen(WinLooseData {
+            trans_state: TransState::TransIn(0.5),
+        });
     }
 
     if events.contains(&GameEvents::GameLost) {
-        state.active_state = ActiveState::LoseScreen;
+        state.active_state = ActiveState::LoseScreen(WinLooseData {
+            trans_state: TransState::TransIn(0.5),
+        });
     }
 
     if events.contains(&GameEvents::MainMenuReturn) {
@@ -279,14 +376,14 @@ pub fn draw_game_state(state: &GameState) -> Result<(), ()> {
     match &state.active_state {
         ActiveState::MainMenu(_) => main_menu::draw(state),
         ActiveState::InGame(_) => gameplay::draw(state),
-        ActiveState::LoseScreen => {
-            clear_background(WHITE);
-            draw_text("You lose", 32.0, 48.0, 32.0, BLACK);
+        ActiveState::LoseScreen(t_state) => {
+            draw_texture(state.textures.get("lose_screen").unwrap(), 0.0, 0.0, WHITE);
+            t_state.trans_state.draw_doors(&state.textures);
             Ok(())
         }
-        ActiveState::WinScreen => {
-            clear_background(WHITE);
-            draw_text("You win", 32.0, 48.0, 32.0, BLACK);
+        ActiveState::WinScreen(t_state) => {
+            draw_texture(state.textures.get("win_screen").unwrap(), 0.0, 0.0, WHITE);
+            t_state.trans_state.draw_doors(&state.textures);
             Ok(())
         }
         _ => todo!(),
