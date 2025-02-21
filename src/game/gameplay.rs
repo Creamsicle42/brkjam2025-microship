@@ -16,6 +16,12 @@ enum MicrogameState {
     InMicrogame(f32),
 }
 
+enum EndPlateState {
+    None,
+    WonMG(u8),
+    LostMG(u8),
+}
+
 impl MicrogameState {
     fn is_in_microgame(&self) -> bool {
         match self {
@@ -32,12 +38,14 @@ pub struct InGameData {
     microgame_state: MicrogameState,
     current_microgame: Microgames,
     game_queue: Vec<u8>,
+    end_plate: EndPlateState,
 }
 
 impl Default for InGameData {
     fn default() -> Self {
         let mut game_queue = gen_microgame_queue();
         InGameData {
+            end_plate: EndPlateState::None,
             microgames_completed: 0,
             lives: 3,
             current_microgame_win: false,
@@ -106,6 +114,9 @@ pub fn update(
                 MicrogameState::InMicrogame(_) => {
                     if !microgame_won {
                         gs_data.lives -= 1;
+                        gs_data.end_plate = EndPlateState::LostMG(1);
+                    } else {
+                        gs_data.end_plate = EndPlateState::WonMG(1);
                     }
                     gs_data.microgames_completed += 1;
                     MicrogameState::TransOut(0.75)
@@ -133,6 +144,15 @@ fn lerp(f: f32, t: f32, d: f32) -> f32 {
     t * d + f * (1.0 - d)
 }
 
+// Scuffed ass function for easing towards the middle
+fn anti_easing(f: f32) -> f32 {
+    if f > 0.5 {
+        ((f - 0.5) * 1.4).powf(2.0) + 0.5
+    } else {
+        0.5 - ((0.5 - f) * 1.4).powf(2.0)
+    }
+}
+
 pub fn draw(game_data: &GameState) -> Result<(), ()> {
     if let ActiveState::InGame(gs_data) = &game_data.active_state {
         match &gs_data.current_microgame {
@@ -149,19 +169,18 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
         }
 
         // Particles
+        let maxtime: f32 = if gs_data.microgames_completed > 9 {
+            3.0
+        } else if gs_data.microgames_completed > 4 {
+            4.0
+        } else {
+            5.0
+        };
 
         // Draw UI
         if let MicrogameState::InMicrogame(t) = gs_data.microgame_state {
-            draw_text(
-                format!("Time Left: {}", t).as_str(),
-                16.0,
-                42.0,
-                32.0,
-                BLACK,
-            );
+            draw_rectangle(30.0, 560.0, 900.0 * (t / maxtime), 10.0, YELLOW);
         } else {
-            draw_text("Hold it!", 16.0, 42.0, 32.0, BLACK);
-
             let r_door = game_data.textures.get("right_door").unwrap();
             let l_door = game_data.textures.get("left_door").unwrap();
 
@@ -182,7 +201,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
                     );
                 }
                 MicrogameState::TransOut(t) => {
-                    let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
+                    let raw_progress = clamp((0.7 - t) * (1.0 / 0.7), 0.0, 1.0);
                     draw_texture(
                         l_door,
                         lerp(-500.0, 0.0, raw_progress * raw_progress),
@@ -195,25 +214,26 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
                         0.0,
                         WHITE,
                     );
+                    match gs_data.end_plate {
+                        EndPlateState::WonMG(s) => {
+                            draw_texture(
+                                game_data.textures.get("good_1").unwrap(),
+                                380.0,
+                                -150.0 + 750.0 * anti_easing(raw_progress),
+                                WHITE,
+                            );
+                        }
+                        _ => {}
+                    };
                 }
                 _ => {}
             };
         }
 
-        draw_text(
-            format!("Lives: {}", gs_data.lives).as_str(),
-            16.0,
-            42.0 + 40.0,
-            32.0,
-            BLACK,
-        );
-        draw_text(
-            format!("Completed: {}", gs_data.microgames_completed).as_str(),
-            16.0,
-            42.0 + 80.0,
-            32.0,
-            BLACK,
-        );
+        let heart = game_data.textures.get("heart").unwrap();
+        for i in 0..gs_data.lives {
+            draw_texture(heart, 16.0 + 80.0 * i as f32, 16.0, WHITE);
+        }
 
         return Ok(());
     } else {

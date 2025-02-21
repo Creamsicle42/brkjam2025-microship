@@ -312,6 +312,9 @@ pub fn get_texture_images() -> HashMap<&'static str, Image> {
     include_texture!(textures, "lose_screen", "../assets/lose_screen.png");
     include_texture!(textures, "win_screen", "../assets/win_screen.png");
 
+    include_texture!(textures, "heart", "../assets/heart.png");
+    include_texture!(textures, "good_1", "../assets/good_1.png");
+
     return textures;
 }
 
