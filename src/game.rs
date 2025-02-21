@@ -314,6 +314,16 @@ pub fn get_texture_images() -> HashMap<&'static str, Image> {
 
     include_texture!(textures, "heart", "../assets/heart.png");
     include_texture!(textures, "good_1", "../assets/good_1.png");
+    include_texture!(textures, "bad_1", "../assets/bad_1.png");
+
+    include_texture!(textures, "pipes_plate", "../assets/pipes_plate.png");
+    include_texture!(textures, "combo_plate", "../assets/combo_plate.png");
+    include_texture!(textures, "course_plate", "../assets/course_plate.png");
+    include_texture!(textures, "sweep_plate", "../assets/sweep_plate.png");
+    include_texture!(textures, "asteroids_plate", "../assets/asteroid_plate.png");
+    include_texture!(textures, "imposter_plate", "../assets/imposter_plate.png");
+    include_texture!(textures, "swap_plate", "../assets/sort_plate.png");
+    include_texture!(textures, "crank_plate", "../assets/crank_plate.png");
 
     return textures;
 }

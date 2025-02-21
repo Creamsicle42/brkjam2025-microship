@@ -129,7 +129,7 @@ pub fn update(
                     if gs_data.lives <= 0 {
                         events.push(GameEvents::GameLost);
                     }
-                    MicrogameState::TransIn(0.75)
+                    MicrogameState::TransIn(1.0)
                 }
             }
         }
@@ -186,7 +186,7 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
 
             match gs_data.microgame_state {
                 MicrogameState::TransIn(t) => {
-                    let raw_progress = clamp((0.5 - t) * 2.0, 0.0, 1.0);
+                    let raw_progress = clamp((1.0 - t), 0.0, 1.0);
                     draw_texture(
                         l_door,
                         lerp(0.0, -500.0, raw_progress * raw_progress),
@@ -197,6 +197,23 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
                         r_door,
                         lerp(462.0, 1000.0, raw_progress * raw_progress),
                         0.0,
+                        WHITE,
+                    );
+                    let mg_plate = match gs_data.current_microgame {
+                        Microgames::Swap(_) => "swap_plate",
+                        Microgames::Pipes(_) => "pipes_plate",
+                        Microgames::Combo(_) => "combo_plate",
+                        Microgames::Sweep(_) => "sweep_plate",
+                        Microgames::Crank(_) => "crank_plate",
+                        Microgames::Course(_) => "course_plate",
+                        Microgames::Imposter(_) => "imposter_plate",
+                        Microgames::Asteroids(_) => "asteroids_plate",
+                        _ => "",
+                    };
+                    draw_texture(
+                        game_data.textures.get(mg_plate).unwrap(),
+                        280.0,
+                        -300.0 + 1000.0 * anti_easing(raw_progress),
                         WHITE,
                     );
                 }
@@ -218,6 +235,14 @@ pub fn draw(game_data: &GameState) -> Result<(), ()> {
                         EndPlateState::WonMG(s) => {
                             draw_texture(
                                 game_data.textures.get("good_1").unwrap(),
+                                380.0,
+                                -150.0 + 750.0 * anti_easing(raw_progress),
+                                WHITE,
+                            );
+                        }
+                        EndPlateState::LostMG(_) => {
+                            draw_texture(
+                                game_data.textures.get("bad_1").unwrap(),
                                 380.0,
                                 -150.0 + 750.0 * anti_easing(raw_progress),
                                 WHITE,
